@@ -497,9 +497,11 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
   // Scrolls to a target context if that context is not on the screen.
   void _scrollTo(BuildContext context) {
     if (_scrolling) return;
-    final RenderObject contextObject = context.findRenderObject()!;
-    final RenderAbstractViewport viewport =
-        RenderAbstractViewport.of(contextObject);
+    
+    try {
+      final RenderObject contextObject = context.findRenderObject()!;
+      final RenderAbstractViewport viewport =
+      RenderAbstractViewport.of(contextObject);
 
 //    if (_scrollController.positions.isEmpty) {
 //      debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_sliver.dart(537) $this._scrollTo: empty pos');
@@ -508,45 +510,46 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
 ////      _scrollController.createScrollPosition(physics, scrollableState.position, oldPosition)
 //    }
 
-    // If and only if the current scroll offset falls in-between the offsets
-    // necessary to reveal the selected context at the top or bottom of the
-    // screen, then it is already on-screen.
+      // If and only if the current scroll offset falls in-between the offsets
+      // necessary to reveal the selected context at the top or bottom of the
+      // screen, then it is already on-screen.
 //    final double margin = widget.direction == Axis.horizontal ? _dropAreaSize.width : _dropAreaSize.height;
-    final double margin = _dropAreaSize.height / 2;
+      final double margin = _dropAreaSize.height / 2;
 
-    assert(
-        _scrollController.hasClients,
-        'An attached scroll controller is needed. '
-        'You probably forgot to attach one to the parent scroll view that contains this reorderable list.');
+      assert(
+      _scrollController.hasClients,
+      'An attached scroll controller is needed. '
+          'You probably forgot to attach one to the parent scroll view that contains this reorderable list.');
 
-    final double scrollOffset = _scrollController.offset;
-    final double topOffset = max(
-      _scrollController.position.minScrollExtent,
-      viewport.getOffsetToReveal(contextObject, 0.0).offset - margin,
-    );
-    final double bottomOffset = min(
-      _scrollController.position.maxScrollExtent,
-      viewport.getOffsetToReveal(contextObject, 1.0).offset + margin,
-    );
-    final bool onScreen =
-        scrollOffset <= topOffset && scrollOffset >= bottomOffset;
+      final double scrollOffset = _scrollController.offset;
+      final double topOffset = max(
+        _scrollController.position.minScrollExtent,
+        viewport.getOffsetToReveal(contextObject, 0.0).offset - margin,
+      );
+      final double bottomOffset = min(
+        _scrollController.position.maxScrollExtent,
+        viewport.getOffsetToReveal(contextObject, 1.0).offset + margin,
+      );
+      final bool onScreen =
+          scrollOffset <= topOffset && scrollOffset >= bottomOffset;
 //    debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_sliver.dart(520) $this._scrollTo: scrollOffset:$scrollOffset topOffset:$topOffset bottomOffset:$bottomOffset onScreen:$onScreen');
-    // If the context is off screen, then we request a scroll to make it visible.
-    if (!onScreen) {
-      _scrolling = true;
-      _scrollController.position
-          .animateTo(
-        scrollOffset < bottomOffset ? bottomOffset : topOffset,
+      // If the context is off screen, then we request a scroll to make it visible.
+      if (!onScreen) {
+        _scrolling = true;
+        _scrollController.position
+            .animateTo(
+          scrollOffset < bottomOffset ? bottomOffset : topOffset,
 //        _scrollController.position.maxScrollExtent,
-        duration: _scrollAnimationDuration,
-        curve: Curves.easeInOut,
-      )
-          .then((void value) {
-        setState(() {
-          _scrolling = false;
+          duration: _scrollAnimationDuration,
+          curve: Curves.easeInOut,
+        )
+            .then((void value) {
+          setState(() {
+            _scrolling = false;
+          });
         });
-      });
-    }
+      }
+    } catch (_) {}
   }
 
   // Wraps children in Row or Column, so that the children flow in
